@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kishan Sharma | ECE Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+   
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            black: '#0a0a0a',
+                            dark: '#111111',
+                            gray: '#1f2937',
+                            primary: '#76B900', // updated COE green
+                            secondary: '#76B900', // unified to #76B900
+                            accent: '#76B900', // unified to #76B900
+                        }
+                    },
+                    fontFamily: {
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                        display: ['"Orbitron"', 'sans-serif'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'glitch': 'glitch 1s linear infinite',
+                    },
+                    keyframes: {
+                        glitch: {
+                            '2%, 64%': { transform: 'translate(2px,0) skew(0deg)' },
+                            '4%, 60%': { transform: 'translate(-2px,0) skew(0deg)' },
+                            '62%': { transform: 'translate(0,0) skew(5deg)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f2937;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #76B900;
+        }
+
+
+        /* Neon Glow Utilities */
+        .neon-text {
+            text-shadow: 0 0 5px rgba(118, 185, 0, 0.75), 0 0 12px rgba(118, 185, 0, 0.45);
+        }
+        .neon-border {
+            box-shadow: 0 0 6px rgba(118, 185, 0, 0.45), inset 0 0 6px rgba(118, 185, 0, 0.18);
+        }
+        .neon-purple-text {
+            text-shadow: 0 0 5px rgba(112, 0, 255, 0.7);
+        }
+       
+        /* Circuit Board Background Setup */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: #050505;
+            opacity: 0.6;
+        }
+
+
+        /* Glassmorphism for cards */
+        .glass-panel {
+            background: rgba(17, 17, 17, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(118, 185, 0, 0.08);
+        }
+
+
+        .section-fade-up {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .section-fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Education card active styling */
+        .edu-card { cursor: pointer; }
+        .edu-card > div { transition: box-shadow 180ms ease, border-color 180ms ease, transform 180ms ease; }
+        .edu-card.edu-active > div { box-shadow: 0 8px 18px rgba(118,185,0,0.06); transform: translateX(4px); }
+    </style>
+</head>
+<body class="bg-cyber-black text-gray-300 font-mono antialiased selection:bg-cyber-primary selection:text-cyber-black">
+
+
+    <!-- Background Animation -->
+    <div id="canvas-container">
+        <canvas id="circuit-canvas"></canvas>
+    </div>
+
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 top-0 start-0 border-b border-white/10 bg-cyber-black/80 backdrop-blur-md">
+        <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+            <a href="#" class="flex items-center space-x-2 rtl:space-x-reverse">
+                <div class="w-8 h-8 border border-cyber-primary flex items-center justify-center rounded">
+                    <span class="text-cyber-primary font-bold font-display">K</span>
+                </div>
+                <span class="self-center text-xl font-display font-semibold whitespace-nowrap text-white tracking-widest">KISHAN'S<span class="text-cyber-primary"> PORTFOLIO</span></span>
+            </a>
+            <div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+                <a href="#contact" class="text-cyber-black bg-cyber-primary hover:bg-white focus:ring-4 focus:outline-none focus:ring-cyan-300 font-bold rounded text-sm px-4 py-2 text-center transition-all duration-300 shadow-[0_0_10px_rgba(118,185,0,0.5)]">
+                Contact Me
+                </a>
+                <button data-collapse-toggle="navbar-sticky" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-400 rounded-lg md:hidden hover:bg-gray-800 focus:outline-none" aria-controls="navbar-sticky" aria-expanded="false" id="menu-toggle">
+                    <span class="sr-only">Open main menu</span>
+                    <i data-lucide="menu"></i>
+                </button>
+            </div>
+            <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-sticky">
+                <ul class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-800 rounded-lg bg-gray-900/50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-transparent">
+                    <li><a href="#about" class="block py-2 px-3 text-white hover:text-cyber-primary transition-colors">About</a></li>
+                    <li><a href="#skills" class="block py-2 px-3 text-white hover:text-cyber-primary transition-colors">Skills</a></li>
+                    <li><a href="#experience" class="block py-2 px-3 text-white hover:text-cyber-primary transition-colors">Experience</a></li>
+                    <li><a href="#projects" class="block py-2 px-3 text-white hover:text-cyber-primary transition-colors">Projects</a></li>
+                    <li><a href="#achievements" class="block py-2 px-3 text-white hover:text-cyber-primary transition-colors">Certifications</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- Hero Section -->
+    <section class="min-h-screen flex items-center justify-center relative pt-20 px-4">
+        <div class="max-w-4xl w-full text-center z-10">
+            <!-- Profile photo (optional) -->
+            
+                <h1 class="mb-4 text-5xl md:text-7xl font-display font-black text-white tracking-tight">
+                HI, I'M <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyber-primary to-cyber-secondary neon-text">KISHAN SHARMA</span>
+            </h1>
+            <p class="mb-8 text-lg md:text-xl text-gray-400 max-w-2xl mx-auto h-16">
+                <span id="typing-text"></span><span class="animate-pulse text-cyber-primary">_</span>
+            </p>
+           
+            <div class="flex flex-col items-center gap-6 mt-8">
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="#projects" class="group relative px-6 py-3 font-bold text-white transition-all duration-300 ease-out border border-cyber-primary hover:bg-cyber-primary/10">
+                    <span class="absolute inset-0 w-full h-full -mt-1 -ml-1 transition-all duration-300 ease-out bg-cyber-primary rounded opacity-0 group-hover:opacity-100 group-hover:mt-0 group-hover:ml-0 z-[-1]"></span>
+                    <span class="flex items-center gap-2">View Projects <i data-lucide="cpu" class="w-4 h-4"></i></span>
+                    </a>
+                
+                    
+                <!-- resume button beside View Projects -->
+                   
+
+                    <a href="Kishan_Sharma_Resume.pdf" target="_blank" aria-label="Open resume" class="group relative px-6 py-3 font-bold text-white transition-all duration-300 ease-out border border-cyber-primary hover:bg-cyber-primary/10">
+                        <span class="absolute inset-0 w-full h-full -mt-1 -ml-1 transition-all duration-300 ease-out bg-cyber-primary rounded opacity-0 group-hover:opacity-100 group-hover:mt-0 group-hover:ml-0 z-[-1]"></span>
+                        <span class="flex items-center gap-2"><i data-lucide="file-text" class="w-4 h-4 text-cyber-primary"></i>Resume</span>
+                    </a>
+
+                </div>
+
+                <!-- social icons placed directly under the buttons -->
+                <div class="flex justify-center gap-6 text-gray-500">
+                    <a href="https://www.linkedin.com/in/kishan-sharma-481735352?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" rel="noopener noreferrer" aria-label="Kishan Sharma on LinkedIn" class="hover:text-cyber-primary transition-colors hover:scale-110 transform">
+                        <i data-lucide="linkedin" class="w-6 h-6"></i>
+                    </a>
+
+                    <a href="https://github.com/kishansharma15" target="_blank" rel="noopener noreferrer" aria-label="Kishan Sharma on GitHub" class="hover:text-cyber-primary transition-colors hover:scale-110 transform">
+                        <i data-lucide="github" class="w-6 h-6"></i>
+                    </a>
+
+                    <a href="mailto:deepocean144@gmail.com" aria-label="Email Kishan Sharma" class="hover:text-cyber-primary transition-colors hover:scale-110 transform">
+                        <i data-lucide="mail" class="w-6 h-6"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+       
+        <!-- Decoration -->
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce text-cyber-primary">
+            <i data-lucide="chevron-down" class="w-8 h-8"></i>
+        </div>
+    </section>
+
+
+    <!-- Contact Section -->
+    <!-- contact moved to bottom -->
+
+
+    <!-- About & Skills Section -->
+    <section id="about" class="py-20 px-4">
+        <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12">
+            <!-- About Terminal -->
+            <div class="section-fade-up">
+                <div class="bg-[#1e1e1e] rounded-lg overflow-hidden border border-gray-700 shadow-2xl">
+                    <div class="bg-[#2d2d2d] px-4 py-2 flex items-center gap-2 border-b border-gray-700">
+                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-cyber-primary"></div>
+                        <span class="ml-2 text-xs text-gray-400 font-mono">user@kishanSharma</span>
+                    </div>
+                    <div class="p-6 font-mono text-sm leading-relaxed text-gray-300">
+                        <p class="mb-4"><span class="text-cyber-primary">➜</span> <span class="text-blue-400">~</span> <span class="text-cyber-primary">Who am I?</span></p>
+                        <p class="mb-4 text-gray-100">
+                            I am Electronics and Communication Engineering student in 7th Semester at GEC Bharuch (GTU) with a passion for bridging the gap between hardware and software.
+                        </p>
+                        <p class="mb-4"><span class="text-cyber-primary">➜</span> <span class="text-blue-400">~</span> <span class="text-cyber-primary">Interests</span></p>
+                        <ul class="list-none space-y-1 text-gray-100">
+                            <li>> Embedded Systems & IoT</li>
+                            <li>> Robotics</li>
+                            <li>> VLSI & FPGA Design</li>
+                            <li>> AL/ML</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Skills -->
+            <div id="skills" class="section-fade-up space-y-6">
+                <h2 class="text-3xl font-display font-bold text-white mb-8 flex items-center gap-3">
+                    <i data-lucide="code-2" class="text-cyber-primary"></i> Tech Stack
+                </h2>
+
+
+                <div>
+                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3">Languages</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-3 py-1 border border-cyber-primary/30 bg-cyber-primary/10 text-cyber-primary rounded text-sm hover:bg-cyber-primary hover:text-black transition-colors cursor-default">C</span>
+                        <span class="px-3 py-1 border border-cyber-primary/30 bg-cyber-primary/10 text-cyber-primary rounded text-sm hover:bg-cyber-primary hover:text-black transition-colors cursor-default">C++</span>
+                        <span class="px-3 py-1 border border-cyber-primary/30 bg-cyber-primary/10 text-cyber-primary rounded text-sm hover:bg-cyber-primary hover:text-black transition-colors cursor-default">Python</span>
+                        <span class="px-3 py-1 border border-cyber-primary/30 bg-cyber-primary/10 text-cyber-primary rounded text-sm hover:bg-cyber-primary hover:text-black transition-colors cursor-default">Ladder Logic</span>
+                        <span class="px-3 py-1 border border-cyber-primary/30 bg-cyber-primary/10 text-cyber-primary rounded text-sm hover:bg-cyber-primary hover:text-black transition-colors cursor-default">Verilog</span>
+
+                    </div>
+                </div>
+
+                 <div>
+                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3">Tools</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-3 py-1 border border-cyber-accent/30 bg-cyber-accent/10 text-cyber-accent rounded text-sm hover:bg-cyber-accent hover:text-black transition-colors cursor-default">Altium</span>
+                        <span class="px-3 py-1 border border-cyber-accent/30 bg-cyber-accent/10 text-cyber-accent rounded text-sm hover:bg-cyber-accent hover:text-black transition-colors cursor-default">Matlab</span>
+                        <span class="px-3 py-1 border border-cyber-accent/30 bg-cyber-accent/10 text-cyber-accent rounded text-sm hover:bg-cyber-accent hover:text-black transition-colors cursor-default">Ansys</span>
+                        <span class="px-3 py-1 border border-cyber-accent/30 bg-cyber-accent/10 text-cyber-accent rounded text-sm hover:bg-cyber-accent hover:text-black transition-colors cursor-default">PX4</span>
+                        <span class="px-3 py-1 border border-cyber-accent/30 bg-cyber-accent/10 text-cyber-accent rounded text-sm hover:bg-cyber-accent hover:text-black transition-colors cursor-default">Power BI</span>
+
+                    </div>
+                </div>
+
+
+                <div>
+                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3">Microcontrollers</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-3 py-1 border border-cyber-secondary/30 bg-cyber-secondary/10 text-cyber-secondary rounded text-sm hover:bg-cyber-secondary hover:text-white transition-colors cursor-default">ESP-32</span>
+                        <span class="px-3 py-1 border border-cyber-secondary/30 bg-cyber-secondary/10 text-cyber-secondary rounded text-sm hover:bg-cyber-secondary hover:text-white transition-colors cursor-default">Arduino UNO</span>
+                        <span class="px-3 py-1 border border-cyber-secondary/30 bg-cyber-secondary/10 text-cyber-secondary rounded text-sm hover:bg-cyber-secondary hover:text-white transition-colors cursor-default">LPC2148 (ARM7TDMI)</span>
+                        <span class="px-3 py-1 border border-cyber-secondary/30 bg-cyber-secondary/10 text-cyber-secondary rounded text-sm hover:bg-cyber-secondary hover:text-white transition-colors cursor-default">MSP430G2553 LaunchPad</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Experience Timeline -->
+    <section id="experience" class="py-20 px-4 bg-cyber-dark/50">
+        <div class="max-w-5xl mx-auto">
+            <h2 class="text-3xl font-display font-bold text-white mb-12 text-center">
+                <span class="border-b-4 border-cyber-primary pb-2">Experience</span>
+            </h2>
+
+
+            <div class="relative border-l border-gray-700 ml-4 md:ml-0 space-y-12">
+               
+                <!-- Experience Item 1 -->
+                <div class="mb-8 md:flex justify-between items-center w-full section-fade-up">
+                    <div class="hidden md:block w-5/12 text-right pr-8">
+                        <h3 class="text-xl font-bold text-white">Embedded Systems Intern</h3>
+                        <p class="text-cyber-primary">IEEE RAS Hyderabad</p>
+                        <span class="text-sm text-gray-500">July 2025 - Present</span>
+                    </div>
+                    <div class="absolute left-0 md:left-1/2 transform -translate-x-1/2 w-4 h-4 bg-cyber-black border-2 border-cyber-primary rounded-full z-10"></div>
+                    <div class="pl-8 md:pl-8 md:w-5/12">
+                        <div class="md:hidden mb-2">
+                            <h3 class="text-xl font-bold text-white">Embedded Systems Intern</h3>
+                            <p class="text-cyber-primary">IEEE RAS Hyderabad</p>
+                            <span class="text-sm text-gray-500">July 2025</span>
+                        </div>
+                        <p class="text-gray-400 text-sm">Hardware-software integration, IoT systems, and PCB Designing. Sponsored by IEEE Robotics & Automation Society.</p>
+                    </div>
+                </div>
+
+
+                <!-- Experience Item 2 -->
+                <div class="mb-8 md:flex justify-between items-center w-full section-fade-up">
+                    <div class="hidden md:block w-5/12 text-right pr-8">
+                        <div class="text-gray-400 text-sm">Developed firmware, designed circuits, and programmed microcontrollers using Arduino platform.</div>
+                    </div>
+                    <div class="absolute left-0 md:left-1/2 transform -translate-x-1/2 w-4 h-4 bg-cyber-black border-2 border-cyber-secondary rounded-full z-10"></div>
+                    <div class="pl-8 md:pl-8 md:w-5/12">
+                        <h3 class="text-xl font-bold text-white">Firmware Engineering Intern</h3>
+                        <p class="text-cyber-secondary">RF Microtech Electronics</p>
+                        <span class="text-sm text-gray-500">July 2025</span>
+                        <div class="md:hidden mt-2 text-gray-400 text-sm">Developed firmware, designed circuits, and programmed microcontrollers.</div>
+                    </div>
+                </div>
+
+
+                <!-- Experience Item 3 -->
+                <div class="mb-8 md:flex justify-between items-center w-full section-fade-up">
+                    <div class="hidden md:block w-5/12 text-right pr-8">
+                        <h3 class="text-xl font-bold text-white">Blockchain Developer Intern</h3>
+                        <p class="text-cyber-accent">Center of Excellence, GTU</p>
+                        <span class="text-sm text-gray-500">Apr 2025 - May 2025</span>
+                    </div>
+                    <div class="absolute left-0 md:left-1/2 transform -translate-x-1/2 w-4 h-4 bg-cyber-black border-2 border-cyber-accent rounded-full z-10"></div>
+                    <div class="pl-8 md:pl-8 md:w-5/12">
+                        <div class="md:hidden mb-2">
+                            <h3 class="text-xl font-bold text-white">Blockchain Developer Intern</h3>
+                            <p class="text-cyber-accent">Center of Excellence, GTU</p>
+                            <span class="text-sm text-gray-500">Apr 2025 - May 2025</span>
+                        </div>
+                        <p class="text-gray-400 text-sm">Developed "Creda - Driver Recognition Passport". Utilized Ganache, MetaMask, and Solidity for smart contracts.</p>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Projects Grid -->
+    <section id="projects" class="py-20 px-4">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-3xl font-display font-bold text-white mb-12 flex items-center gap-3">
+                <i data-lucide="cpu" class="text-cyber-primary"></i> Projects
+            </h2>
+
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+               
+                <!-- Project 1 -->
+                <div class="glass-panel p-6 rounded-xl hover:bg-white/5 transition-all duration-300 group section-fade-up">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-3 bg-cyber-primary/10 rounded-lg text-cyber-primary">
+                            <i data-lucide="shield-check" class="w-6 h-6"></i>
+                        </div>
+                        <a href="#" class="text-gray-500 hover:text-white"><i data-lucide="external-link" class="w-5 h-5"></i></a>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2 group-hover:text-cyber-primary transition-colors">Creda - Driver Passport</h3>
+                    <p class="text-gray-400 text-sm mb-4">Blockchain-based identity verification system for drivers using Solidity Smart Contracts. Integrated with MetaMask and Ganache.</p>
+                    <div class="flex flex-wrap gap-2 mt-auto">
+                        <span class="text-xs font-mono text-cyber-primary">#Solidity</span>
+                        <span class="text-xs font-mono text-cyber-primary">#Blockchain</span>
+                        <span class="text-xs font-mono text-cyber-primary">#React</span>
+                    </div>
+                </div>
+
+
+                <!-- Project 2 -->
+                <div class="glass-panel p-6 rounded-xl hover:bg-white/5 transition-all duration-300 group section-fade-up">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-3 bg-cyber-secondary/10 rounded-lg text-cyber-secondary">
+                            <i data-lucide="droplets" class="w-6 h-6"></i>
+                        </div>
+                        <a href="#" class="text-gray-500 hover:text-white"><i data-lucide="external-link" class="w-5 h-5"></i></a>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2 group-hover:text-cyber-secondary transition-colors">Aresion Perfume Site</h3>
+                    <p class="text-gray-400 text-sm mb-4">Promotional website for a fictional brand developed using IBM Watson AI and Prompt Engineering techniques.</p>
+                    <div class="flex flex-wrap gap-2 mt-auto">
+                        <span class="text-xs font-mono text-cyber-secondary">#AI</span>
+                        <span class="text-xs font-mono text-cyber-secondary">#PromptEngineering</span>
+                        <span class="text-xs font-mono text-cyber-secondary">#Web</span>
+                    </div>
+                </div>
+
+
+                 <!-- Project 3 -->
+                 <div class="glass-panel p-6 rounded-xl hover:bg-white/5 transition-all duration-300 group section-fade-up">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-3 bg-cyber-accent/10 rounded-lg text-cyber-accent">
+                            <i data-lucide="layers" class="w-6 h-6"></i>
+                        </div>
+                        <a href="#" class="text-gray-500 hover:text-white"><i data-lucide="external-link" class="w-5 h-5"></i></a>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2 group-hover:text-cyber-accent transition-colors">IoT Sensor Ecosystem</h3>
+                    <p class="text-gray-400 text-sm mb-4">Work on indigenous IoT sensors and actuators. Experience with privacy protocols and computing platforms.</p>
+                    <div class="flex flex-wrap gap-2 mt-auto">
+                        <span class="text-xs font-mono text-cyber-accent">#IoT</span>
+                        <span class="text-xs font-mono text-cyber-accent">#Hardware</span>
+                        <span class="text-xs font-mono text-cyber-accent">#C-DAC</span>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Education & Certifications -->
+    <section id="achievements" class="py-20 px-4 bg-cyber-dark/50">
+        <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12">
+           
+            <!-- Education (horizontal slider) -->
+            <div class="section-fade-up">
+                <h2 class="text-2xl font-display font-bold text-white mb-6 flex items-center gap-2">
+                    <i data-lucide="graduation-cap" class="text-cyber-primary"></i> Education
+                </h2>
+
+                <!-- Slider wrapper -->
+                <div class="relative">
+
+                    <!-- Vertical arrows -->
+                    <button id="edu-up" aria-label="Up" class="absolute left-1/2 -translate-x-1/2 -top-3 z-10 p-2 bg-white/5 rounded-full border border-white/5 hover:bg-white/10 hidden md:inline-flex">
+                        <i data-lucide="chevron-up" class="w-4 h-4 text-white"></i>
+                    </button>
+
+                    <button id="edu-down" aria-label="Down" class="absolute left-1/2 -translate-x-1/2 -bottom-3 z-10 p-2 bg-white/5 rounded-full border border-white/5 hover:bg-white/10 hidden md:inline-flex">
+                        <i data-lucide="chevron-down" class="w-4 h-4 text-white"></i>
+                    </button>
+
+                    <!-- Scrollable vertical track -->
+                    <div id="education-slider" class="flex flex-col overflow-y-auto gap-4 scroll-smooth snap-y snap-mandatory h-64 py-2 pb-4">
+
+                        <!-- Card 1 -->
+                        <article class="edu-card snap-start glass-panel p-4 rounded-lg border border-gray-700 bg-transparent">
+                            <div class="border-l-4 border-cyber-primary pl-4">
+                                <h3 class="text-lg font-bold text-white">B.E. Electronics & Communication</h3>
+                                <p class="text-gray-400">GEC Bharuch (GTU)</p>
+                                <div class="flex justify-between text-sm mt-1">
+                                    <span class="text-cyber-primary">2022 - 2026</span>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Card 2 -->
+                        <article class="edu-card snap-start glass-panel p-4 rounded-lg border border-gray-700 bg-transparent">
+                            <div class="border-l-4 border-gray-700 pl-4">
+                                <h3 class="text-lg font-bold text-white">HSC(Science)</h3>
+                                <p class="text-gray-400">BHS Bagikhana</p>
+                                <div class="flex justify-between text-sm mt-1">
+                                    <span class="text-gray-500">2020 - 2022</span>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Card 3 -->
+                        <article class="edu-card snap-start glass-panel p-4 rounded-lg border border-gray-700 bg-transparent">
+                            <div class="border-l-4 border-gray-700 pl-4">
+                                <h3 class="text-lg font-bold text-white">SSC(General)</h3>
+                                <p class="text-gray-400">BHS Danteshwar</p>
+                                <div class="flex justify-between text-sm mt-1">
+                                    <span class="text-gray-500">2019 - 2020</span>
+                                </div>
+                            </div>
+                        </article>
+
+                    </div>
+
+                    <!-- Small pager (mobile) -->
+                    <div class="flex justify-center gap-2 mt-3 md:hidden" id="education-dots"></div>
+                </div>
+            </div>
+
+
+            <!-- Certifications List -->
+            <div class="section-fade-up">
+                <h2 class="text-2xl font-display font-bold text-white mb-6 flex items-center gap-2">
+                    <i data-lucide="award" class="text-cyber-secondary"></i> Achievements & certificates
+                </h2>
+                <div class="space-y-3 h-64 overflow-y-auto pr-2 custom-scrollbar">
+                    <div class="flex items-center gap-3 p-3 bg-white/5 rounded-lg border border-white/5 hover:border-cyber-secondary transition-colors">
+                        <i data-lucide="check-circle" class="w-5 h-5 text-cyber-secondary flex-shrink-0"></i>
+                        <span class="text-sm text-gray-300">Qiskit Fall Fest 2025 (IBM Quantum)</span>
+                    </div>
+                    <div class="flex items-center gap-3 p-3 bg-white/5 rounded-lg border border-white/5 hover:border-cyber-secondary transition-colors">
+                        <i data-lucide="check-circle" class="w-5 h-5 text-cyber-secondary flex-shrink-0"></i>
+                        <span class="text-sm text-gray-300">Google AI Essentials (Coursera)</span>
+                    </div>
+                    <div class="flex items-center gap-3 p-3 bg-white/5 rounded-lg border border-white/5 hover:border-cyber-secondary transition-colors">
+                        <i data-lucide="check-circle" class="w-5 h-5 text-cyber-secondary flex-shrink-0"></i>
+                        <span class="text-sm text-gray-300">RTL Design & Verification (Silicon Sandbox)</span>
+                    </div>
+                    <div class="flex items-center gap-3 p-3 bg-white/5 rounded-lg border border-white/5 hover:border-cyber-secondary transition-colors">
+                        <i data-lucide="check-circle" class="w-5 h-5 text-cyber-secondary flex-shrink-0"></i>
+                        <span class="text-sm text-gray-300">Fundamentals of Deep Learning (PDEU)</span>
+                    </div>
+                    <div class="flex items-center gap-3 p-3 bg-white/5 rounded-lg border border-white/5 hover:border-cyber-secondary transition-colors">
+                        <i data-lucide="check-circle" class="w-5 h-5 text-cyber-secondary flex-shrink-0"></i>
+                        <span class="text-sm text-gray-300">Drone Data Processing (COE)</span>
+                    </div>
+                    <div class="flex items-center gap-3 p-3 bg-white/5 rounded-lg border border-white/5 hover:border-cyber-secondary transition-colors">
+                        <i data-lucide="check-circle" class="w-5 h-5 text-cyber-secondary flex-shrink-0"></i>
+                        <span class="text-sm text-gray-300">Brain Computer Interfaces Workshop</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Contact (moved to bottom) -->
+    <section id="contact" class="py-20 px-4 bg-gradient-to-br from-cyber-dark/60 via-transparent to-transparent">
+        <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-12">
+            <!-- left column: contact card (aligns with Education left column) -->
+            <div class="section-fade-up md:col-span-2">
+                <h2 class="text-3xl font-display font-bold text-white mb-6">Open to Opportunities</h2>
+
+                <div class="glass-panel p-6 rounded-lg mx-4 md:mx-0 border border-gray-700 w-full">
+                <p class="text-gray-300 mb-4">I am a passionate fresher eager to learn and grow. If you have any Reseach project,project, internship, job and advice, I would love to connect with you!</p>
+
+                <!-- Form - using FormSubmit (no backend needed). Replace the destination email if needed -->
+                <!-- Use formsubmit token instead of naked email to keep address private -->
+                <form action="https://formsubmit.co/1a7f9e7a9b02c17169f8bef98860d3de" method="POST" class="grid grid-cols-1 gap-3">
+                    <!-- Honeypot field (invisible to humans) to deter spam bots -->
+                    <input type="text" name="_honey" autocomplete="off" tabindex="-1" class="hidden" aria-hidden="true">
+                    <input type="text" name="name" placeholder="Your Name" required class="border p-3 rounded bg-transparent text-gray-200 border-gray-700 focus:ring-0 focus:outline-none" />
+                    <input type="email" name="email" placeholder="Your Email" required class="border p-3 rounded bg-transparent text-gray-200 border-gray-700 focus:ring-0 focus:outline-none" />
+                    <textarea name="message" placeholder="Your Message" required class="border p-3 rounded min-h-[120px] bg-transparent text-gray-200 border-gray-700 focus:ring-0 focus:outline-none"></textarea>
+
+                    <!-- Redirect to a thank-you page after submit -->
+                    <!-- If you deploy on GitHub Pages replace 'thank-you.html' with the full absolute URL for reliability -->
+                    <input type="hidden" name="_next" value="thank-you.html">
+
+                    <!-- Security: disable captcha for convenience, configure as needed -->
+                    <input type="hidden" name="_captcha" value="false">
+
+                    <div class="flex items-center justify-between gap-3 mt-2 flex-wrap">
+                        <button type="submit" class="px-6 py-3 bg-cyber-primary text-cyber-black font-bold rounded-lg hover:brightness-105 transition-all">Send Message</button>
+
+                        <div class="text-xs text-gray-400">Or email me directly at <a href="mailto:deepocean144@gmail.com" class="text-cyber-primary hover:underline">deepocean144@gmail.com</a></div>
+                    </div>
+                </form>
+                </div>
+            </div>
+
+            <!-- right column: optional empty column to match layout (keeps spacing aligned with Education) -->
+            <div class="hidden md:block"></div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-8 border-t border-gray-800 text-center text-gray-500 text-sm">
+        <p>Designed & Built by <span class="text-cyber-primary">Kishan Sharma</span></p>
+        <p class="mt-2 text-xs">Based on Resume Data • 2025</p>
+    </footer>
+
+
+    <!-- Scripts -->
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+
+        // Navbar Toggle
+        const menuToggle = document.getElementById('menu-toggle');
+        const navbarSticky = document.getElementById('navbar-sticky');
+        menuToggle.addEventListener('click', () => {
+            navbarSticky.classList.toggle('hidden');
+        });
+
+
+        // Typing Effect
+        const textToType = ["ECE_Fresher.", "IoT_Enthusiast.", "Robotics_Learner.", "AI/ML_Passionate.","VLSI_Explorer.","Designing."];
+        let textIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        const typeSpeed = 100;
+        const deleteSpeed = 50;
+        const pauseTime = 2000;
+        const typeElement = document.getElementById('typing-text');
+
+
+        function type() {
+            const currentText = textToType[textIndex];
+           
+            if (isDeleting) {
+                typeElement.textContent = currentText.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                typeElement.textContent = currentText.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+
+            let currentSpeed = isDeleting ? deleteSpeed : typeSpeed;
+
+
+            if (!isDeleting && charIndex === currentText.length) {
+                currentSpeed = pauseTime;
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                textIndex = (textIndex + 1) % textToType.length;
+            }
+
+
+            setTimeout(type, currentSpeed);
+        }
+
+
+        // Start Typing
+        document.addEventListener('DOMContentLoaded', type);
+
+
+
+
+        // Intersection Observer for Animations
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+
+        document.querySelectorAll('.section-fade-up').forEach((el) => {
+            observer.observe(el);
+        });
+
+
+
+
+        // Circuit Board Canvas Animation
+        const canvas = document.getElementById('circuit-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+       
+        // Configuration
+        const particleCount = 60; // Number of nodes
+        const connectionDistance = 150;
+        const speed = 0.5;
+
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * speed;
+                this.vy = (Math.random() - 0.5) * speed;
+                this.size = Math.random() * 2 + 1;
+            }
+
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+
+                // Bounce off edges
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+            }
+
+
+            draw() {
+                ctx.fillStyle = 'rgba(10, 255, 0, 0.5)'; // Green (COE)
+                 ctx.beginPath();
+                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                 ctx.fill();
+             }
+         }
+
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+
+
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+
+
+                // Draw connections
+                for (let j = i; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+
+                    if (distance < connectionDistance) {
+                        ctx.beginPath();
+                        const opacity = 1 - (distance / connectionDistance);
+                        ctx.strokeStyle = `rgba(118, 185, 0, ${opacity * 0.2})`;
+                        ctx.lineWidth = 1;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+
+
+            requestAnimationFrame(animate);
+        }
+
+
+        window.addEventListener('resize', () => {
+            resize();
+            initParticles();
+        });
+
+
+        // Initialize
+        resize();
+        initParticles();
+        animate();
+
+
+        // Education vertical slider (prev/next + mobile dots)
+        function initEducationSlider() {
+            const slider = document.getElementById('education-slider');
+            if (!slider) return;
+
+            const prev = document.getElementById('edu-up');
+            const next = document.getElementById('edu-down');
+            const dots = document.getElementById('education-dots');
+            const items = Array.from(slider.querySelectorAll('.edu-card'));
+
+            let active = 0;
+
+            function renderDots() {
+                if (!dots) return;
+                dots.innerHTML = '';
+                items.forEach((_, i) => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'w-2 h-2 rounded-full bg-white/30';
+                    if (i === active) btn.classList.add('bg-cyber-primary');
+                    btn.addEventListener('click', () => scrollToIndex(i));
+                    dots.appendChild(btn);
+                });
+            }
+
+            function scrollToIndex(i) {
+                if (i < 0 || i >= items.length) return;
+                items[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                active = i;
+                renderDots();
+                // update visual active state on cards (green left border for the active item)
+                items.forEach((card, idx) => {
+                    const inner = card.querySelector(':scope > div');
+                    if (!inner) return;
+                    if (idx === active) {
+                        inner.classList.remove('border-gray-700');
+                        inner.classList.add('border-cyber-primary');
+                        card.classList.add('edu-active');
+                    } else {
+                        inner.classList.remove('border-cyber-primary');
+                        inner.classList.add('border-gray-700');
+                        card.classList.remove('edu-active');
+                    }
+                });
+            }
+
+            prev?.addEventListener('click', () => scrollToIndex(Math.max(0, active - 1)));
+            next?.addEventListener('click', () => scrollToIndex(Math.min(items.length - 1, active + 1)));
+
+            // Make cards clickable — clicking a card scrolls it into view and sets it active
+            items.forEach((card, i) => {
+                card.addEventListener('click', () => scrollToIndex(i));
+            });
+
+            // Update active index after scrolling settles (vertical/detect center)
+            let settleTimer;
+            slider.addEventListener('scroll', () => {
+                clearTimeout(settleTimer);
+                settleTimer = setTimeout(() => {
+                    const sliderRect = slider.getBoundingClientRect();
+                    let best = 0, bestDist = Infinity;
+                    items.forEach((card, idx) => {
+                        const r = card.getBoundingClientRect();
+                        const center = r.top + r.height / 2;
+                        const sliderCenter = sliderRect.top + sliderRect.height / 2;
+                        const d = Math.abs(center - sliderCenter);
+                        if (d < bestDist) { bestDist = d; best = idx; }
+                    });
+                    active = best;
+                    renderDots();
+                }, 80);
+            });
+
+            // Init
+            renderDots();
+            window.addEventListener('resize', () => scrollToIndex(active));
+        }
+
+        // Boot education slider (safe to run — DOM is already present)
+        initEducationSlider();
+
+        // Profile photo upload/preview (persist in localStorage)
+        function initProfilePhoto() {
+            const input = document.getElementById('profile-input');
+            const img = document.getElementById('profile-photo');
+            const placeholder = document.getElementById('profile-placeholder');
+            const removeBtn = document.getElementById('remove-photo');
+            if (!input || !img || !placeholder) return;
+
+            // Restore saved image if present
+            try {
+                const saved = localStorage.getItem('profilePhoto');
+                if (saved) {
+                    img.src = saved;
+                    img.classList.remove('hidden');
+                    placeholder.style.display = 'none';
+                    removeBtn.classList.remove('hidden');
+                }
+            } catch (e) {
+                // localStorage unavailable — ignore
+            }
+
+            // Choose a new image
+            input.addEventListener('change', () => {
+                const file = input.files && input.files[0];
+                if (!file) return;
+                if (!file.type.startsWith('image/')) return alert('Please choose an image file');
+
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    const data = ev.target.result;
+                    img.src = data;
+                    img.classList.remove('hidden');
+                    placeholder.style.display = 'none';
+                    removeBtn.classList.remove('hidden');
+                    try { localStorage.setItem('profilePhoto', data); } catch (err) { /* ignore */ }
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // Remove photo (revert to placeholder)
+            removeBtn?.addEventListener('click', () => {
+                try { localStorage.removeItem('profilePhoto'); } catch (e) {}
+                img.src = '';
+                img.classList.add('hidden');
+                placeholder.style.display = 'flex';
+                removeBtn.classList.add('hidden');
+                input.value = '';
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initProfilePhoto);
+
+
+    </script>
+</body>
+</html>
+
